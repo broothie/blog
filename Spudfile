@@ -1,0 +1,59 @@
+require 'erb'
+require 'kramdown'
+require 'stringio'
+
+layout = ERB.new(File.read('layout.html.erb'))
+
+spud 'build' do
+  invoke 'build:posts'
+  invoke 'build:index'
+end
+
+spud 'build:index' do
+  builder = StringIO.new
+  builder.puts '<h1>A Blog For Things</h1>'
+  builder.puts '<ul>'
+  each_post_file do |_, basename, title|
+    builder.puts "<li><a href='#{basename}.html'>#{title}</a></li>"
+  end
+  builder.puts '<ul>'
+
+  title = 'A Blog For Things'
+  content = builder.string
+  File.write('index.html', layout.result(binding))
+end
+
+spud 'build:posts' do
+  each_post_file do |filename, basename, title|
+    markdown = File.read(filename)
+
+    content = Kramdown::Document.new(markdown).to_html
+
+    puts "#{filename} -> #{basename}.md"
+    File.write("#{basename}.html", layout.result(binding))
+  end
+end
+
+spud 'new' do |title|
+  timestamp = Time.now.to_s.split(' ').first
+  title = title.gsub(/\s/, '_')
+
+  sh 'mkdir _posts'
+  sh "touch _posts/#{timestamp}_#{title}.md"
+end
+
+spud 'clean' do
+  sh 'rm *.html'
+end
+
+spud 'serve' do
+  sh 'fileserver'
+end
+
+def each_post_file(&block)
+  Dir.glob('_posts/*.md').each do |filename|
+    basename = File.basename(filename, '.md')
+    title = basename.chars.drop(11).join.gsub(/[_-]/, ' ').split(' ').map(&:capitalize).join(' ')
+    block.call(filename, basename, title)
+  end
+end

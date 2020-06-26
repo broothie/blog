@@ -1,0 +1,12 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/broothie/blog.git",
+  "author": "broothie <adbooth8@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^1.12.4",
+    "parcel-plugin-markdown": "^0.4.2"
+  }
+}
