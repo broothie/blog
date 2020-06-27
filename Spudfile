@@ -38,8 +38,8 @@ spud 'new' do |title|
   timestamp = Time.now.to_s.split(' ').first
   title = title.gsub(/\s/, '_')
 
-  sh 'mkdir _posts'
-  sh "touch _posts/#{timestamp}_#{title}.md"
+  sh 'mkdir posts'
+  sh "touch posts/#{timestamp}_#{title}.md"
 end
 
 spud 'clean' do
@@ -51,7 +51,7 @@ spud 'serve' do
 end
 
 def each_post_file(&block)
-  Dir.glob('_posts/*.md').each do |filename|
+  Dir.glob('posts/*.md').each do |filename|
     basename = File.basename(filename, '.md')
     title = basename.chars.drop(11).join.gsub(/[_-]/, ' ').split(' ').map(&:capitalize).join(' ')
     block.call(filename, basename, title)
